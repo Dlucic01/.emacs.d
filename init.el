@@ -6,10 +6,25 @@
 
 ;; Org
 (transient-mark-mode 1)
-(require 'org)
-(use-package org-superstar)
-(setq org-todo-keywords
-      '((sequence "TODO" "FEEDBACK" "VERIFY" "|" "DONE" "DELEGATED")))
+
+(defun efs/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1))
+
+(use-package org
+  :config
+  (setq org-ellipsis " ▼"
+	org-hide-emphasis-markers t))
+
+
++(require 'org)
++(use-package org-superstar)
+ (setq org-todo-keywords
+       '((sequence "TODO" "FEEDBACK" "VERIFY" "|" "DONE" "DELEGATED")))
+
+(use-package ox-pandoc)
 
 ;; Org babel for mysql
 (org-babel-do-load-languages
@@ -31,7 +46,7 @@
 (setq sql-connection-alist
 '((pool-a
 (sql-product 'mysql)
-(sql-server "127.0.0.1")
+(sql-server "192.168.0.101")
 (sql-user "core")
 (sql-password "w")
 (sql-database "mplayer")
@@ -87,6 +102,7 @@
 			 ("elpa" . "https://elpa.gnu.org/packages/")))
     
 
+
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -110,7 +126,7 @@
  '(jdee-db-spec-breakpoint-face-colors (cons "#000000" "#494949"))
  '(objed-cursor-color "#CC9393")
  '(package-selected-packages
-   '(treemacs php-mode doom-themes helpful ivy-rich which-key rainbow-delimiters all-the-icons-completion all-the-icons doom-modeline use-package modus-themes ox-slack magit ivy smex counsel org-plus-contrib org))
+   '(treemacs pandoc-mode pandoc ox-pandoc md md4rd md-readme conkeror org-sql php-model\.el kbd php-mode doom-themes helpful ivy-rich which-key rainbow-delimiters all-the-icons-completion all-the-icons doom-modeline use-package modus-themes ox-slack magit ivy smex counsel org-plus-contrib org))
  '(rustic-ansi-faces
    ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCDC"])
  '(vc-annotate-background "#3F3F3F")
@@ -198,18 +214,18 @@
 (set-frame-parameter (selected-frame) 'alpha '(85 . 50))
  (add-to-list 'default-frame-alist '(alpha . (85 . 50)))
 
-;;(defun toggle-transparency ()
-;   (interactive)
-;   (let ((alpha (frame-parameter nil 'alpha)))
-;     (set-frame-parameter
-;      nil 'alpha
-;      (if (eql (cond ((numberp alpha) alpha)
-;                     ((numberp (cdr alpha)) (cdr alpha))
-;                     ;; Also handle undocumented (<active> <inactive>) form.
-;                     ((numberp (cadr alpha)) (cadr alpha)))
-;               100)
-;          '(85 . 50) '(100 . 100)))))
-; (global-set-key (kbd "C-c t") 'toggle-transparency)
+(defun toggle-transparency ()
+   (interactive)
+   (let ((alpha (frame-parameter nil 'alpha)))
+     (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(85 . 50) '(100 . 100)))))
+ (global-set-key (kbd "C-c t") 'toggle-transparency)
 
 (use-package ivy-rich
   :init
@@ -245,13 +261,13 @@
 
 ;;; Bindings
 
-(global-set-key (kbd "C-c i") 'all-the-icons-insert)
-
 ;; Binding for theme picker
 (global-set-key (kbd "C-c a") 'counsel-load-theme)
 
 ;; Buffer switch
 (global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
+
+(global-set-key (kbd "C-c i") 'all-the-icons-insert)
 
 ;; newline-without-break-of-line
 (defun newline-without-break-of-line ()
@@ -265,10 +281,21 @@
 
 (global-set-key (kbd "<S-return>") 'newline-without-break-of-line)
 
+;; Line breaks
+(setq visual-line-mode t)
 
-(org-superstar-mode)
+
+;; Scratch
+(setq initial-scratch-message "")
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :config
+  (setq org-superstar-special-todo-items t))
 ;;(use-package org-latex)
 ;;(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 (use-package treemacs)
-(global-set-key (kbd "c-c t") 'treemacs)
+(global-set-key (kbd "C-c t") 'treemacs)
+
